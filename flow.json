@@ -1,1 +1,133 @@
-[]
+[
+    {
+        "id": "db0cf964ae069deb",
+        "type": "tab",
+        "label": "Grammar correction",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c0ff70f302486a73",
+        "type": "http in",
+        "z": "db0cf964ae069deb",
+        "name": "",
+        "url": "/createGrammarCorrection",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 140,
+        "wires": [
+            [
+                "eaa0c30e371979a4"
+            ]
+        ]
+    },
+    {
+        "id": "eaa0c30e371979a4",
+        "type": "function",
+        "z": "db0cf964ae069deb",
+        "name": "OpenAI API properties",
+        "func": "\n//const api_key = global.get('process_env').OPENAI_API\nconst api_key = msg.payload.key;\nconst content = msg.payload.text;\n\n// OpenAI API properties\nconst settings = {\n    model: \"text-davinci-003\",\n    prompt: content,\n    temperature: 0,\n    max_tokens: 60,\n    top_p: 1.0,\n    frequency_penalty: 0.0,\n    presence_penalty: 0.0\n};\n\nif (api_key) {\n    msg.url = 'https://api.openai.com/v1/completions';\n    msg.headers = {\n        'Content-Type': 'application/json',\n        'Authorization': `Bearer ${api_key}`,\n    };\n    msg.payload = settings;\n    msg.settings = settings;\n    return [msg, null];\n} else {\n    msg.payload = settings;\n    msg.settings = settings;\n    return [null, msg];\n}\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "outputs": 2,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 140,
+        "wires": [
+            [
+                "fa42a0df5f206921"
+            ],
+            [
+                "b47bd67e52c5f9d8"
+            ]
+        ]
+    },
+    {
+        "id": "fa42a0df5f206921",
+        "type": "http request",
+        "z": "db0cf964ae069deb",
+        "name": "OpenAI API",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 140,
+        "wires": [
+            [
+                "19dab91cf1623f9a"
+            ]
+        ]
+    },
+    {
+        "id": "19dab91cf1623f9a",
+        "type": "function",
+        "z": "db0cf964ae069deb",
+        "name": "Response",
+        "func": "function convertPayloadToObject(msg) {\n    let objArr = [];\n    for (const [key, value] of Object.entries(msg)) {\n        objArr.push({ key, value });\n    }\n    return objArr;\n}\nif (!msg.payload.error) {\n    msg.payload = {\n        succsess: true,\n        text: msg.payload.choices[0].text,\n        settings: convertPayloadToObject(msg.settings)\n    }\n} else {\n    msg.payload = {\n        succsess: false,\n        payload: msg.payload.error.code\n    }\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 140,
+        "wires": [
+            [
+                "671610f89489ce82"
+            ]
+        ]
+    },
+    {
+        "id": "671610f89489ce82",
+        "type": "http response",
+        "z": "db0cf964ae069deb",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 990,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "b47bd67e52c5f9d8",
+        "type": "function",
+        "z": "db0cf964ae069deb",
+        "name": "Response",
+        "func": "function convertPayloadToObject(msg) {\n    let objArr = [];\n    for (const [key, value] of Object.entries(msg)) {\n        objArr.push({ key, value });\n    }\n    return objArr;\n}\nif (!msg.payload.error) {\n    msg.payload = {\n        succsess: true,\n        text: msg.payload.choices[0].text,\n        settings: convertPayloadToObject(msg.settings)\n    }\n} else {\n    msg.payload = {\n        succsess: false,\n        payload: msg.payload.error.code\n    }\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 610,
+        "y": 180,
+        "wires": [
+            [
+                "145a3ec51059486a"
+            ]
+        ]
+    },
+    {
+        "id": "145a3ec51059486a",
+        "type": "http response",
+        "z": "db0cf964ae069deb",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 760,
+        "y": 180,
+        "wires": []
+    }
+]
